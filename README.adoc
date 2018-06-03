@@ -1,0 +1,22 @@
+:source-highlighter: prettify
+
+= Pacman
+Frank van Westerop <https://github.com/fvanwesterop[@fvanwesterop]>
+ifdef::env-github,env-browser[:outfilesuffix: .adoc]
+
+:javagamestutorial: http://zetcode.com/tutorials/javagamestutorial/
+:pacman: http://zetcode.com/tutorials/javagamestutorial/pacman/
+
+== Origin
+
+This is a fork of a Java-based and fairly simple implementation of the famous 80's game Pacman. The original sources where taken from the
+{javagamestutorial}[Java 2D Games Tutorial] on zetcode.com, which contains and explains implementations of a number of classic games aside from the rudimentary {pacman}[Pacman] implementation that forms the base of this version. It's really worth a {javagamestutorial}[visit]!
+
+== Plans
+
+The idea is to take Zetcode's Java 2D tutorial version and transform it into a nice playable game that eventually will run on an Arcade Game console which will be build from a wooden cabinet, a RPi (probably) and some old LCD screen. Things to do are:
+- Port it to Groovy 2.5 or 3.0, just to make it an interesting exercise
+- Refactor the code a bit since it does not really separates concerns very well
+- Add sound effects, since the original game does not have any sounds
+- Extend the maze since it is a bit small right now
+- Add levels, since there is only one in the original

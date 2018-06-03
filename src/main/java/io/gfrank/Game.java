@@ -1,11 +1,11 @@
-package com.zetcode;
+package io.gfrank;
 
 import java.awt.EventQueue;
 import javax.swing.JFrame;
 
-public class Pacman extends JFrame {
+public class Game extends JFrame {
 
-    public Pacman() {
+    public Game() {
 
         initUI();
     }
@@ -13,7 +13,7 @@ public class Pacman extends JFrame {
     private void initUI() {
 
         add(new Board());
-        setTitle("Pacman");
+        setTitle("Game");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(380, 420);
         setLocationRelativeTo(null);
@@ -26,7 +26,7 @@ public class Pacman extends JFrame {
 
             @Override
             public void run() {
-                Pacman ex = new Pacman();
+                Game ex = new Game();
                 ex.setVisible(true);
             }
         });
