@@ -1,13 +1,12 @@
+### Gradle
 .gradle
-/build/
-/out/
-!gradle/wrapper/gradle-wrapper.jar
+build
 
 ### OSX, ZSH etc. ###
 **/.DS_Store
 .gradletasknamecache
 
-### STS ###
+### Eclipse STS ###
 .apt_generated
 .classpath
 .factorypath
@@ -23,9 +22,8 @@
 out
 
 ### NetBeans ###
-nbproject/private/
-build/
-nbbuild/
-dist/
-nbdist/
-.nb-gradle/
+nbproject/privatex/
+nbbuild
+dist
+nbdist
+.nb-gradle
