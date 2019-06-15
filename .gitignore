@@ -1,6 +1,7 @@
 ### Gradle
 .gradle
 build
+build-cache
 
 ### OSX, ZSH etc. ###
 **/.DS_Store
