@@ -1,24 +1,12 @@
 package io.gfrank
 
+import io.gfrank.pacman.gui.Board
+
+import javax.swing.JPanel
 import java.awt.EventQueue
 import javax.swing.JFrame
 
 class Game extends JFrame {
-
-    Game() {
-
-        initUI()
-    }
-
-    private void initUI() {
-
-        add(new Board())
-        setTitle("Game")
-        setDefaultCloseOperation(EXIT_ON_CLOSE)
-        setSize(380, 420)
-        setLocationRelativeTo(null)
-        setVisible(true)
-    }
 
     static void main(def args) {
 
@@ -26,8 +14,17 @@ class Game extends JFrame {
 
             @Override
             void run() {
-                Game ex = new Game()
-                ex.setVisible(true)
+                Game game = new Game()
+                game.setTitle("Pacman")
+                game.setDefaultCloseOperation(EXIT_ON_CLOSE)
+                game.setLocationRelativeTo(null)
+                game.setResizable(false)
+
+                JPanel board = new Board()
+                game.getContentPane().add(board)
+
+                game.pack()
+                game.setVisible(true)
             }
         })
     }

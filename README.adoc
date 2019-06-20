@@ -17,9 +17,9 @@ Groovy Pacman is based on a fairly simple Java implementation of the famous 80's
 The idea is to start-off with Zetcode's Java 2D tutorial version and transform it into a nice playable game that eventually will run on an Arcade Game console such as shown below. The hardware part will be an interresting project on it's own, involving building a cabinet from wood, paint it properly and assemble the electronics probably using a RPi and buttons and stuff from Adafruit or a similar shop.
 
 .example display
-image::https://www.homeleisuredirect.com/Assets/HLD/User/17754-vintage-pac-man-arcade-machine-screen.jpg[display,,500,,role="left"]
+image::pac-man-screen.png[display,,500,,role="left"]
 .example cabinet
-image::https://www.thepinballcompany.com/wp-content/uploads/2017/02/Ms-Pacman-Galaga-Left.jpg[cabinet,,400,role="right"]
+image::pacman-cabinet.jpg[cabinet,,400,role="right"]
 
 
 == Things to do
