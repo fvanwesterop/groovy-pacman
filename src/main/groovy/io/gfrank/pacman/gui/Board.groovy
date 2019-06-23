@@ -118,7 +118,7 @@ class Board extends JPanel implements ActionListener {
     int req_dx, req_dy, view_dx, view_dy
 
 
-    Timer timer;
+    Timer timer
 
     Board() {
         addKeyListener(new GameKeyListener())
@@ -600,6 +600,31 @@ class Board extends JPanel implements ActionListener {
         paintBoard(g as Graphics2D)
     }
 
+    def paintBoard(Graphics2D g2d) {
+
+        drawBackGround(g2d, backGroundColor)
+        drawMaze(g2d)
+        drawScore(g2d)
+        doAnimation()
+
+        switch (gameMode) {
+
+            case RUNNING:
+                continueGame(g2d)
+                break
+            case STOPPED:
+                paintIntroScreen(g2d)
+                break
+            case PAUSED:
+                paintPausedScreen(g2d)
+                pauseGame()
+                break
+            default:
+                throw new InvalidParameterException("bug: unsupported game state '$gameMode' detected")
+        }
+        getDefaultToolkit().sync()
+    }
+
     class GameKeyListener extends KeyAdapter {
 
         @Override
@@ -616,31 +641,6 @@ class Board extends JPanel implements ActionListener {
                     handlePauzedModeKey(keyEvent)
                     break
             }
-        }
-
-        def paintBoard(Graphics2D g2d) {
-
-            drawBackGround(g2d, backGroundColor)
-            drawMaze(g2d)
-            drawScore(g2d)
-            doAnimation()
-
-            switch (gameMode) {
-
-                case RUNNING:
-                    continueGame(g2d)
-                    break
-                case STOPPED:
-                    paintIntroScreen(g2d)
-                    break
-                case PAUSED:
-                    paintPausedScreen(g2d)
-                    pauseGame()
-                    break
-                default:
-                    throw new InvalidParameterException("bug: unsupported game state '$gameMode' detected")
-            }
-            getDefaultToolkit().sync()
         }
 
         @Override
