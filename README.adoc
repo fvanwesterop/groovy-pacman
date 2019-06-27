@@ -6,6 +6,7 @@ ifdef::env-github,env-browser[:outfilesuffix: .adoc]
 
 :javagamestutorial: http://zetcode.com/tutorials/javagamestutorial/
 :pacman: http://zetcode.com/tutorials/javagamestutorial/pacman/
+:pacman-addicts: https://sites.google.com/site/pacmangamearcade/
 
 == Origin
 
@@ -15,6 +16,10 @@ Groovy Pacman is based on a fairly simple Java implementation of the famous 80's
 == Plans
 
 The idea is to start-off with Zetcode's Java 2D tutorial version and transform it into a nice playable game that eventually will run on an Arcade Game console such as shown below. The hardware part will be an interresting project on it's own, involving building a cabinet from wood, paint it properly and assemble the electronics probably using a RPi and buttons and stuff from Adafruit or a similar shop.
+
+The original Zetcode implrmrntation of the game is fairly limited: the ghosts are all the same, while the original game had four distinct ghosts named Blinky (the red one), Inky (blue), Pinky (pink, obviously) and Clyde (orange). They all have distinctive behaviour when chasing Pacman. I'd like to put those behaviours back in. And replace the simple white sprites for the original sprites, including moving eyes ofcourse. Furthermore there is only one level at the moment, utilizing a (too) simple maze. Would be nice to have multiple levels and mazes that look more like the original game. Big help to reconstruct both maze and ghosts is the {pacman-addicts}[Pacman addicts corner] site.
+
+Also the original code is rather procedural rather than object oriented: it's just two files basically, called Game and Board. The Game 'class' actually just contains some bootstrap code and the entire game itself is contained in the Board class. We can do a lot better that that, so that too is on the changes todo list.
 
 .example display
 image::pac-man-screen.png[display,,500,,role="left"]

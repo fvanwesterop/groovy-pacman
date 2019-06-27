@@ -62,7 +62,7 @@ class Board extends JPanel implements ActionListener {
     static final Integer maxSpeed = 6
 
     static final smallFont = new Font("Helvetica", Font.BOLD, 14)
-    static final dotColor = new Color(255, 242, 12)
+    static final dotColor = new Color(242, 212, 12)
     static final mazeColor = new Color(0, 0, 200)
     static final backGroundColor = black
 
@@ -83,7 +83,7 @@ class Board extends JPanel implements ActionListener {
     final dx = new ArrayList(4)
     final dy = new ArrayList(4)
 
-    static final ghost = loadImageIcon("ghost")
+    static final ghost = loadImageIcon("blinky-left-small")
     static final pacman1 = loadImageIcon("pacman")
     static final pacman2up = loadImageIcon("up1")
     static final pacman3up = loadImageIcon("up2")
