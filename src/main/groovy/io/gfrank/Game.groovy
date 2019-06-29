@@ -2,30 +2,27 @@ package io.gfrank
 
 import io.gfrank.pacman.gui.Board
 
-import javax.swing.JPanel
-import java.awt.EventQueue
 import javax.swing.JFrame
+
+import static java.awt.EventQueue.invokeLater
 
 class Game extends JFrame {
 
-    static void main(def args) {
+    static main(def args) {
 
-        EventQueue.invokeLater(new Runnable() {
+        invokeLater {
 
-            @Override
-            void run() {
-                Game game = new Game()
-                game.setTitle("Pacman")
-                game.setDefaultCloseOperation(EXIT_ON_CLOSE)
-                game.setLocationRelativeTo(null)
-                game.setResizable(false)
+            def game = new Game()
+            def board = new Board()
 
-                JPanel board = new Board()
-                game.getContentPane().add(board)
+            game.contentPane.add(board)
+            game.title = 'Pacman'
+            game.defaultCloseOperation = EXIT_ON_CLOSE
+            game.locationRelativeTo = null
+            game.resizable = false
 
-                game.pack()
-                game.setVisible(true)
-            }
-        })
+            game.pack()
+            game.visible = true
+        }
     }
 }
