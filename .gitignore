@@ -1,3 +1,6 @@
+### exclude KiCAD files for now
+kicad
+
 ### Gradle
 .gradle
 build
