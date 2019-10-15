@@ -1,0 +1,27 @@
+<!--
+    When your test-logging appender(s) do not work, enable the debug-flag below
+    -->
+<configuration debug="false" scan="true" scanPeriod="5 seconds">
+
+    <!--
+        When your test-logging does not work at all, enable this listener to see what logback's config-file parser is doing
+        -->
+<!--    <statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener"/>-->
+
+    <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+        <resetJUL>true</resetJUL>
+    </contextListener>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>[%blue(PROD)] %date{HH:mm:ss.SSS} [%highlight(%level)] %magenta(%logger) [%file:%line] - %blue(%msg%n)</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="io.gfrank" level="debug"/>
+
+    <root level="debug">
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+</configuration>

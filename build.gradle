@@ -21,10 +21,10 @@ repositories {
 dependencies {
     compile "org.codehaus.groovy:groovy-all:${groovy_sdk_version}"
     compile "org.slf4j:slf4j-api:${slf4j_version}"
-    compile "org.slf4j:slf4j-simple:${slf4j_version}"
 
     testCompile "org.spockframework:spock-core:${spock_version}"
-    testCompile "ch.qos.logback:logback-classic:${logback_version}"
+
+    runtimeOnly "ch.qos.logback:logback-classic:${logback_version}"
 }
 
 run {
