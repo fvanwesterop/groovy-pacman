@@ -1,14 +1,18 @@
 package io.gfrank
 
+import groovy.util.logging.Slf4j
 import io.gfrank.pacman.gui.Board
 
 import javax.swing.JFrame
 
 import static java.awt.EventQueue.invokeLater
 
+@Slf4j
 class Game extends JFrame {
 
     static main(def args) {
+
+        log.info('starting game..')
 
         invokeLater {
 
