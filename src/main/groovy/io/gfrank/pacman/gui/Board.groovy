@@ -2,7 +2,6 @@ package io.gfrank.pacman.gui
 
 import groovy.util.logging.Slf4j
 
-import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.Event
@@ -120,7 +119,11 @@ class Board extends JPanel implements ActionListener {
 
     Timer timer
 
+    Maze maze
+
     Board() {
+        maze = new Maze(blockCount: N_BLOCKS, blockSize: BLOCK_SIZE, mazeColor: mazeColor, dotColor: dotColor)
+        add(maze)
         addKeyListener(new GameKeyListener())
         setFocusable(true)
         setBackground(backGroundColor)
@@ -135,43 +138,6 @@ class Board extends JPanel implements ActionListener {
         g2d.fillRect(0, 0, BOARD_SIZE, BOARD_SIZE)
     }
 
-    def drawMaze(Graphics2D g2d) {
-
-        short i = 0
-        int x, y
-
-        for (y = 0; y < BOARD_SIZE; y += BLOCK_SIZE) {
-
-            for (x = 0; x < BOARD_SIZE; x += BLOCK_SIZE) {
-
-                g2d.setColor(mazeColor)
-                g2d.setStroke(new BasicStroke(4))
-
-                if ((screenData[i] & 1) != 0) { // 1th bit 'on'? draw vertical line on the left side of the block
-                    g2d.drawLine(x, y, x, y + BLOCK_SIZE - 1)
-                }
-
-                if ((screenData[i] & 2) != 0) { // 2nd bit 'on'? draw horizontal line to the top of the block
-                    g2d.drawLine(x, y, x + BLOCK_SIZE - 1, y)
-                }
-
-                if ((screenData[i] & 4) != 0) { // 3d bit 'on'? draw vertical line on the right side of the block
-                    g2d.drawLine(x + BLOCK_SIZE - 1, y, x + BLOCK_SIZE - 1,  y + BLOCK_SIZE - 1)
-                }
-
-                if ((screenData[i] & 8) != 0) { // 4th bit 'on'? draw horizontal line at the bottom of the block
-                    g2d.drawLine(x, y + BLOCK_SIZE - 1, x + BLOCK_SIZE - 1, y + BLOCK_SIZE - 1)
-                }
-
-                if ((screenData[i] & 16) != 0) {
-                    g2d.setColor(dotColor)
-                    g2d.fillOval(x + 21 , y + 21, 6, 6)
-                }
-
-                i++
-            }
-        }
-    }
 
     def drawScore(Graphics2D g2d) {
 
@@ -204,6 +170,8 @@ class Board extends JPanel implements ActionListener {
 
         resetGame()
         loadLevel()
+
+        maze.screenData = this.screenData
 
         int framerate = 40
         timer = new Timer(framerate, this)
@@ -603,7 +571,7 @@ class Board extends JPanel implements ActionListener {
     def paintBoard(Graphics2D g2d) {
 
         drawBackGround(g2d, backGroundColor)
-        drawMaze(g2d)
+        maze.drawMaze(g2d)
         drawScore(g2d)
         doAnimation()
 
