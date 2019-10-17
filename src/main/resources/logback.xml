@@ -14,7 +14,7 @@
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>[%blue(PROD)] %date{HH:mm:ss.SSS} [%highlight(%level)] %magenta(%logger) [%file:%line] - %blue(%msg%n)</pattern>
+            <pattern>[%red(PROD)] %date{HH:mm:ss.SSS} [%highlight(%level)] %magenta(%logger) [%file:%line] - %blue(%msg%n)</pattern>
         </encoder>
     </appender>
 
