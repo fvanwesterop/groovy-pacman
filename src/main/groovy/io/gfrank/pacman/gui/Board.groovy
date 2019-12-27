@@ -98,7 +98,7 @@ class Board extends JPanel implements ActionListener {
     static final pacman4right = loadImageIcon("right3")
 
     static loadImageIcon(String imageName) {
-        new ImageIcon(getClass().getResource("/images/${imageName}.png")).image
+        new ImageIcon(Board.class.getResource("${imageName}.png")).image
     }
 
     enum GameState {
