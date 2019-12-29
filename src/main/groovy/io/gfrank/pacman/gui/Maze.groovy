@@ -1,6 +1,6 @@
 package io.gfrank.pacman.gui
 
-import groovy.util.logging.Log4j
+
 import groovy.util.logging.Slf4j
 
 import javax.swing.*
@@ -18,7 +18,7 @@ class Maze extends JPanel {
     @Override
     void paint(Graphics g) {
         super.paintComponent(g)
-        drawMaze(g as Graphics2D)
+        paintMaze(g as Graphics2D)
         log.info 'painting...'
 
     }
@@ -30,7 +30,7 @@ class Maze extends JPanel {
 
     }
 
-    def drawMaze(Graphics2D g2d) {
+    def paintMaze(Graphics2D g2d) {
 
 
         def boardSize = blockCount * blockSize
@@ -60,7 +60,7 @@ class Maze extends JPanel {
                     g2d.drawLine(x, y + blockSize - 1, x + blockSize - 1, y + blockSize - 1)
                 }
 
-                if ((screenData[i] & 16) > 0) {
+                if ((screenData[i] & 16) > 0) { // 5th bit 'on'? draw small pill
                     g2d.setColor(dotColor)
                     g2d.fillOval(x + 21 , y + 21, 6, 6)
                 }

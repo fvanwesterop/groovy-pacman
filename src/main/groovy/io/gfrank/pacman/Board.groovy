@@ -1,60 +1,26 @@
-package io.gfrank.pacman.gui
+package io.gfrank.pacman
 
 import groovy.util.logging.Slf4j
+import io.gfrank.pacman.gui.Maze
 
-import java.awt.Color
-import java.awt.Dimension
-import java.awt.Event
-import java.awt.Font
-import java.awt.FontMetrics
-import java.awt.Graphics
-import java.awt.Graphics2D
+import javax.swing.*
+import java.awt.*
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
-
-import javax.swing.ImageIcon
-import javax.swing.JPanel
-import javax.swing.Timer
 import java.security.InvalidParameterException
+import java.util.List
 
-import static io.gfrank.pacman.gui.Board.GameState.PAUSED
-import static io.gfrank.pacman.gui.Board.GameState.RUNNING
-import static io.gfrank.pacman.gui.Board.GameState.STOPPED
+import static io.gfrank.pacman.Board.GameState.*
 import static java.awt.Color.black
 import static java.awt.Toolkit.defaultToolkit
-import static java.awt.event.KeyEvent.VK_DOWN
-import static java.awt.event.KeyEvent.VK_ESCAPE
-import static java.awt.event.KeyEvent.VK_LEFT
-import static java.awt.event.KeyEvent.VK_Q
-import static java.awt.event.KeyEvent.VK_RIGHT
-import static java.awt.event.KeyEvent.VK_S
-import static java.awt.event.KeyEvent.VK_SPACE
-import static java.awt.event.KeyEvent.VK_UP
+import static java.awt.event.KeyEvent.*
 
 @Slf4j
 class Board extends JPanel implements ActionListener {
 
-    static final levelOneData = [
-            19, 26, 26, 26, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 22,
-            21, 0, 0, 0, 17, 16, 16, 16, 16, 16, 16, 16, 16, 16, 20,
-            21, 0, 0, 0, 17, 16, 16, 16, 16, 16, 16, 16, 16, 16, 20,
-            21, 0, 0, 0, 17, 16, 16, 24, 16, 16, 16, 16, 16, 16, 20,
-            17, 18, 18, 18, 16, 16, 20, 0, 17, 16, 16, 16, 16, 16, 20,
-            17, 16, 16, 16, 16, 16, 20, 0, 17, 16, 16, 16, 16, 24, 20,
-            25, 16, 16, 16, 24, 24, 28, 0, 25, 24, 24, 16, 20, 0, 21,
-            1, 17, 16, 20, 0, 0, 0, 0, 0, 0, 0, 17, 20, 0, 21,
-            1, 17, 16, 16, 18, 18, 22, 0, 19, 18, 18, 16, 20, 0, 21,
-            1, 17, 16, 16, 16, 16, 20, 0, 17, 16, 16, 16, 20, 0, 21,
-            1, 17, 16, 16, 16, 16, 20, 0, 17, 16, 16, 16, 20, 0, 21,
-            1, 17, 16, 16, 16, 16, 16, 18, 16, 16, 16, 16, 20, 0, 21,
-            1, 17, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 20, 0, 21,
-            1, 25, 24, 24, 24, 24, 24, 24, 24, 24, 16, 16, 16, 18, 20,
-            9, 8, 8, 8, 8, 8, 8, 8, 8, 8, 25, 24, 24, 24, 28
-    ] as List<Short>
-
-    def screenData = [N_BLOCKS * N_BLOCKS] as List<Short>
+    List screenData = []
 
 
     static final validSpeeds = [1, 2, 3, 4, 6, 8] as List<Short>
@@ -74,13 +40,19 @@ class Board extends JPanel implements ActionListener {
     static final Integer MAX_GHOSTS = 24
     static final Integer PACMAN_SPEED = 6
 
-    final ghost_x = new ArrayList(MAX_GHOSTS)
-    final ghost_y = new ArrayList(MAX_GHOSTS)
-    final ghost_dx = new ArrayList(MAX_GHOSTS)
-    final ghost_dy = new ArrayList(MAX_GHOSTS)
-    final ghostSpeed = new ArrayList(MAX_GHOSTS)
-    final dx = new ArrayList(4)
-    final dy = new ArrayList(4)
+    // positions of ghosts
+    List<Integer> ghosts_x
+    List<Integer> ghosts_y
+
+    // headings (directions) of ghosts
+    List<Integer> ghosts_dx
+    List<Integer> ghosts_dy
+
+    // speeds of ghosts
+    List<Integer> ghosts_speed
+
+    final dx = []
+    final dy = []
 
     static final ghost = loadImageIcon("blinky-left-small")
     static final pacman1 = loadImageIcon("pacman")
@@ -98,22 +70,23 @@ class Board extends JPanel implements ActionListener {
     static final pacman4right = loadImageIcon("right3")
 
     static loadImageIcon(String imageName) {
-        new ImageIcon(Board.class.getResource("${imageName}.png")).image
+
+        new ImageIcon(Maze.class.getResource("${imageName}.png")).image
     }
 
     enum GameState {
-        RUNNING, PAUSED, STOPPED
+        RUNNING, PAUSED, STOPPED, LEVEL_LOST, LEVELCOMPLETE
     }
-    def gameMode = STOPPED
+    def gameState = STOPPED
     def dying = false
     Integer currentSpeed = 3
     Integer pacAnimCount = PAC_ANIM_DELAY
     Integer pacAnimDir = 1
     Integer pacmanAnimPos = 0
-    Integer nuberOfGhosts = 6
+    Integer numberOfGhosts = 4
     Integer pacsLeft, score
 
-    int pacman_x, pacman_y, pacmand_x, pacmand_y
+    int pacman_x, pacman_y, pacman_dx, pacman_dy
     int req_dx, req_dy, view_dx, view_dy
 
 
@@ -127,7 +100,7 @@ class Board extends JPanel implements ActionListener {
         addKeyListener(new GameKeyListener())
         setFocusable(true)
         setBackground(backGroundColor)
-        setPreferredSize(new Dimension(BOARD_SIZE, BOARD_SIZE + pacman3left.getHeight() + 5))
+        setPreferredSize(new Dimension(BOARD_SIZE, BOARD_SIZE + pacman3left.getHeight(null) + 5))
         setDoubleBuffered(true)
         initGame()
     }
@@ -146,7 +119,7 @@ class Board extends JPanel implements ActionListener {
 
         g2d.drawString("Score: $score", (BOARD_SIZE - 96) as Float, (BOARD_SIZE + 16) as Float)
 
-        (1..<pacsLeft).each { n ->
+        for (int n = 1; n < pacsLeft; n++) {
             g2d.drawImage(pacman3left, ((n - 1) * 28 + 8) as Integer, (BOARD_SIZE + 1) as Integer, this)
         }
     }
@@ -169,12 +142,15 @@ class Board extends JPanel implements ActionListener {
         log.debug('initGame()')
 
         resetGame()
-        loadLevel()
-
+        loadNextLevel()
         maze.screenData = this.screenData
 
-        int framerate = 40
-        timer = new Timer(framerate, this)
+        /*
+         * create and start a timer that wil fire ActionEvents at 1/framerate [ms] intervals.
+         * Each event will cause a repaint of the screen and is essentially the heartbeat of the game.
+         */
+        int framerate = 50 // unit: [Hz]
+        timer = new Timer((1 / framerate * 1000) as int, this)
         timer.start()
     }
 
@@ -183,54 +159,79 @@ class Board extends JPanel implements ActionListener {
         log.debug('startGame():')
         log.debug('-----------')
         resetGame()
-        loadLevel()
+        loadNextLevel()
+        startLevel()
+        log.debug('-----------')
+    }
+
+    def nextLevel() {
+        log.debug('-----------')
+        log.debug('nextLevel():')
+        log.debug('-----------')
+
+        pacsLeft += 2
+        score += 50
+
+
+        if (numberOfGhosts < MAX_GHOSTS) {
+            numberOfGhosts++
+        }
+
+        if (currentSpeed < maxSpeed) {
+            currentSpeed++
+        }
+
+        loadNextLevel()
         startLevel()
         log.debug('-----------')
     }
 
     def resetGame() {
         log.debug('resetGame()')
-        pacsLeft = 4
+        pacsLeft = 3
         score = 0
-        nuberOfGhosts = 6
+        numberOfGhosts = 4
         currentSpeed = 3
     }
 
-    def loadLevel() {
+    def loadNextLevel() {
         log.debug('loadLevel()')
-        (0..N_BLOCKS * N_BLOCKS).each {
-            screenData[it] = levelOneData[it]
-        }
+        screenData.addAll(LevelData.levelOne)
     }
 
     def startLevel() {
         log.debug('startLevel()')
 
-        short i
+        short ghostId
         int dx = 1
 
-        for (i = 0; i < nuberOfGhosts; i++) {
+        ghosts_x = []; ghosts_dx = []
+        ghosts_y = []; ghosts_dy = []
+        ghosts_speed = []
+
+        for (ghostId = 0; ghostId < numberOfGhosts; ghostId++) {
 
             // set ghosts start positions
-            ghost_y[i] = 4 * BLOCK_SIZE
-            ghost_x[i] = 4 * BLOCK_SIZE
-            ghost_dy[i] = 0
-            ghost_dx[i] = dx
+            ghosts_x[ghostId] = 4 * BLOCK_SIZE
+            ghosts_dx[ghostId] = dx
             dx = -dx
+
+            ghosts_y[ghostId] = 4 * BLOCK_SIZE
+            ghosts_dy[ghostId] = 0
 
             // set a randomspeed for each ghost
             int random = (int) (Math.random() * (currentSpeed + 1))
             if (random > currentSpeed) {
                 random = currentSpeed
             }
-            ghostSpeed[i] = validSpeeds[random]
+            ghosts_speed[ghostId] = validSpeeds[random]
         }
 
         // set pacman start position and state
         pacman_x = 7 * BLOCK_SIZE
         pacman_y = 11 * BLOCK_SIZE
-        pacmand_x = 0
-        pacmand_y = 0
+        pacman_dx = 0
+        pacman_dy = 0
         req_dx = 0
         req_dy = 0
         view_dx = -1
@@ -256,18 +257,33 @@ class Board extends JPanel implements ActionListener {
     def continueGame(Graphics2D g2d) {
 
         if (dying) {
-            death()
+            pacsLeft--
+            if (pacsLeft == 0) {
+                gameState = LEVEL_LOST
+            } else {
+                startLevel()
+            }
+
         } else {
-            calcPosPacman()
+            calcPostitionPacman()
             movePacman(g2d)
             calcPosAndMoveGhosts(g2d)
-            checkMaze()
+
+            if (isLevelComplete()) {
+
+                nextLevel()
+            }
         }
     }
 
     def paintIntroScreen(Graphics2D g2d) {
         drawSplashBox(g2d)
         drawSplashText(g2d, 'Press s to start, q to quit.')
+    }
+
+    def paintGameOverScreen(Graphics2D g2d) {
+        drawSplashBox(g2d)
+        drawSplashText(g2d, 'Game Over! Press any key to exit.')
     }
 
     def paintPausedScreen(Graphics2D g2d) {
@@ -303,77 +319,46 @@ class Board extends JPanel implements ActionListener {
         g2d.drawString(text, x, y)
     }
 
-    def checkMaze() {
-
-        def finished = true
-        Short i = 0
-
-        def k = N_BLOCKS * N_BLOCKS
-        while (i < k && finished) {
-
-            if ((screenData[i] & 48) != 0) {
-                finished = false
-            }
-            i++
-        }
-
-        if (finished) {
-
-            score += 50
-
-            if (nuberOfGhosts < MAX_GHOSTS) {
-                nuberOfGhosts++
-            }
-
-            if (currentSpeed < maxSpeed) {
-                currentSpeed++
-            }
-
-            loadLevel()
-            startLevel()
-        }
-    }
-
-    def death() {
-        pacsLeft--
-        if (pacsLeft == 0) {
-            gameMode = STOPPED
-        }
-        startLevel()
+    def isLevelComplete() {
+        // if maze field has bit #5 set it contains a pill
+        def pillsLeft = screenData.findAll { (it & 16) > 0 }.size() - 179
+        log.debug 'pills left: {}', pillsLeft
+        return pillsLeft == 0
     }
 
     def calcPosAndMoveGhosts(Graphics2D g2d) {
 
-        short i
+        short ghostId
         int pos
         int count
 
-        for (i = 0; i < nuberOfGhosts; i++) {
+        for (ghostId = 0; ghostId < numberOfGhosts; ghostId++) {
 
-            if (ghost_x[i] % BLOCK_SIZE == 0 && ghost_y[i] % BLOCK_SIZE == 0) {
-                pos = ghost_x[i] / BLOCK_SIZE + N_BLOCKS * (int) (ghost_y[i] / BLOCK_SIZE)
+            if (ghosts_x[ghostId] % BLOCK_SIZE == 0 && ghosts_y[ghostId] % BLOCK_SIZE == 0) {
+
+                pos = ghosts_x[ghostId] / BLOCK_SIZE + N_BLOCKS * (int) (ghosts_y[ghostId] / BLOCK_SIZE)
 
                 count = 0
 
-                if ((screenData[pos] & 1) == 0 && ghost_dx[i] != 1) {
+                if ((screenData[pos] & 1) == 0 && ghosts_dx[ghostId] != 1) {
                     dx[count] = -1
                     dy[count] = 0
                     count++
                 }
 
-                if ((screenData[pos] & 2) == 0 && ghost_dy[i] != 1) {
+                if ((screenData[pos] & 2) == 0 && ghosts_dy[ghostId] != 1) {
                     dx[count] = 0
                     dy[count] = -1
                     count++
                 }
 
-                if ((screenData[pos] & 4) == 0 && ghost_dx[i] != -1) {
+                if ((screenData[pos] & 4) == 0 && ghosts_dx[ghostId] != -1) {
                     dx[count] = 1
                     dy[count] = 0
                     count++
                 }
 
-                if ((screenData[pos] & 8) == 0 && ghost_dy[i] != -1) {
+                if ((screenData[pos] & 8) == 0 && ghosts_dy[ghostId] != -1) {
                     dx[count] = 0
                     dy[count] = 1
                     count++
@@ -382,11 +367,11 @@ class Board extends JPanel implements ActionListener {
                 if (count == 0) {
 
                     if ((screenData[pos] & 15) == 15) {
-                        ghost_dx[i] = 0
-                        ghost_dy[i] = 0
+                        ghosts_dx[ghostId] = 0
+                        ghosts_dy[ghostId] = 0
                     } else {
-                        ghost_dx[i] = -ghost_dx[i]
-                        ghost_dy[i] = -ghost_dy[i]
+                        ghosts_dx[ghostId] = -ghosts_dx[ghostId]
+                        ghosts_dy[ghostId] = -ghosts_dy[ghostId]
                     }
 
                 } else {
@@ -397,21 +382,24 @@ class Board extends JPanel implements ActionListener {
                         count = 3
                     }
 
-                    ghost_dx[i] = dx[count]
-                    ghost_dy[i] = dy[count]
+                    ghosts_dx[ghostId] = dx[count]
+                    ghosts_dy[ghostId] = dy[count]
                 }
-
             }
 
-            ghost_x[i] = ghost_x[i] + (ghost_dx[i] * ghostSpeed[i])
-            ghost_y[i] = ghost_y[i] + (ghost_dy[i] * ghostSpeed[i])
+            log.debug('ghost #{}/{} : speed={}, position=[{}, {}], direction=[{}, {}]', ghostId, numberOfGhosts, ghosts_speed[ghostId], ghosts_x[ghostId], ghosts_y[ghostId], ghosts_dx[ghostId], ghosts_dy[ghostId])
 
-            drawGhost(g2d, ghost_x[i] + 1, ghost_y[i] + 1)
+            ghosts_x[ghostId] = ghosts_x[ghostId] + (ghosts_dx[ghostId] * ghosts_speed[ghostId])
+            ghosts_y[ghostId] = ghosts_y[ghostId] + (ghosts_dy[ghostId] * ghosts_speed[ghostId])
 
-            if (pacman_x > (ghost_x[i] - 12) && pacman_x < (ghost_x[i] + 12)
-                    && pacman_y > (ghost_y[i] - 12) && pacman_y < (ghost_y[i] + 12)
-                    && gameMode == RUNNING) {
+            drawGhost(g2d, ghosts_x[ghostId] + 1, ghosts_y[ghostId] + 1)
 
+            // detect if pacman collides with ghost
+            if (gameState == RUNNING
+                    && pacman_x > (ghosts_x[ghostId] - 12) && pacman_x < (ghosts_x[ghostId] + 12)
+                    && pacman_y > (ghosts_y[ghostId] - 12) && pacman_y < (ghosts_y[ghostId] + 12)
+            ) {
+                log.debug('pacman collided with ghost')
                 dying = true
             }
         }
@@ -421,20 +409,20 @@ class Board extends JPanel implements ActionListener {
         g2d.drawImage(ghost, x, y, this)
     }
 
-    def calcPosPacman() {
+    def calcPostitionPacman() {
 
         int pos
         short ch
 
-        if (req_dx == -pacmand_x && req_dy == -pacmand_y) {
-            pacmand_x = req_dx
-            pacmand_y = req_dy
-            view_dx = pacmand_x
-            view_dy = pacmand_y
+        if (req_dx == -pacman_dx && req_dy == -pacman_dy) {
+            pacman_dx = req_dx
+            pacman_dy = req_dy
+            view_dx = pacman_dx
+            view_dy = pacman_dy
         }
 
         if (pacman_x % BLOCK_SIZE == 0 && pacman_y % BLOCK_SIZE == 0) {
-            pos = pacman_x / BLOCK_SIZE + N_BLOCKS * (int) (pacman_y / BLOCK_SIZE)
+            pos = (int) (pacman_x / BLOCK_SIZE) + (N_BLOCKS * (int) (pacman_y / BLOCK_SIZE))
             ch = screenData[pos]
 
             if ((ch & 16) != 0) {
@@ -447,24 +435,24 @@ class Board extends JPanel implements ActionListener {
                         || (req_dx == 1 && req_dy == 0 && (ch & 4) != 0)
                         || (req_dx == 0 && req_dy == -1 && (ch & 2) != 0)
                         || (req_dx == 0 && req_dy == 1 && (ch & 8) != 0))) {
-                    pacmand_x = req_dx
-                    pacmand_y = req_dy
-                    view_dx = pacmand_x
-                    view_dy = pacmand_y
+                    pacman_dx = req_dx
+                    pacman_dy = req_dy
+                    view_dx = pacman_dx
+                    view_dy = pacman_dy
                 }
             }
 
             // Check for standstill
-            if ((pacmand_x == -1 && pacmand_y == 0 && (ch & 1) != 0)
-                    || (pacmand_x == 1 && pacmand_y == 0 && (ch & 4) != 0)
-                    || (pacmand_x == 0 && pacmand_y == -1 && (ch & 2) != 0)
-                    || (pacmand_x == 0 && pacmand_y == 1 && (ch & 8) != 0)) {
-                pacmand_x = 0
-                pacmand_y = 0
+            if ((pacman_dx == -1 && pacman_dy == 0 && (ch & 1) != 0)
+                    || (pacman_dx == 1 && pacman_dy == 0 && (ch & 4) != 0)
+                    || (pacman_dx == 0 && pacman_dy == -1 && (ch & 2) != 0)
+                    || (pacman_dx == 0 && pacman_dy == 1 && (ch & 8) != 0)) {
+                pacman_dx = 0
+                pacman_dy = 0
             }
         }
-        pacman_x = pacman_x + PACMAN_SPEED * pacmand_x
-        pacman_y = pacman_y + PACMAN_SPEED * pacmand_y
+        pacman_x = pacman_x + PACMAN_SPEED * pacman_dx
+        pacman_y = pacman_y + PACMAN_SPEED * pacman_dy
     }
 
     def movePacman(Graphics2D g2d) {
@@ -554,41 +542,64 @@ class Board extends JPanel implements ActionListener {
 
     /**
      * Events are sent by the {@link Timer} instance and are fired at the framerate.
-     * Each event is just a trigger to repaint the {@link Board}
+     * Each event is just a trigger to repaint the {@link Board}.
+     *
+     * The implementation just calls {@link Board#paint(java.awt.Graphics)}, which in turn calls {@link Board#paintBoard(java.awt.Graphics2D)}
      * @param event
      */
     @Override
     void actionPerformed(ActionEvent event) {
+        // causes this component
         repaint()
     }
 
+    /**
+     * Called by
+     * @param g
+     */
     @Override
     void paint(Graphics g) {
         super.paintComponent(g)
         paintBoard(g as Graphics2D)
     }
 
+    /**
+     * this is essentially the main loop: it is implicitly called by the configured {@link #timer}
+     * @param g2d
+     * @return
+     */
     def paintBoard(Graphics2D g2d) {
 
         drawBackGround(g2d, backGroundColor)
-        maze.drawMaze(g2d)
+        maze.paintMaze(g2d)
         drawScore(g2d)
         doAnimation()
 
-        switch (gameMode) {
+        switch (gameState) {
 
             case RUNNING:
                 continueGame(g2d)
                 break
+
+            case LEVEL_LOST:
+                paintGameOverScreen(g2d)
+                break
+
+            case LEVELCOMPLETE:
+                nextLevel()
+                break
+
             case STOPPED:
                 paintIntroScreen(g2d)
                 break
+
             case PAUSED:
                 paintPausedScreen(g2d)
                 pauseGame()
                 break
+
             default:
-                throw new InvalidParameterException("bug: unsupported game state '$gameMode' detected")
+                throw new InvalidParameterException("bug: unsupported game state '$gameState' detected")
         }
         getDefaultToolkit().sync()
     }
@@ -598,9 +609,12 @@ class Board extends JPanel implements ActionListener {
         @Override
         void keyPressed(KeyEvent keyEvent) {
 
-            switch(gameMode) {
+            switch (gameState) {
                 case RUNNING:
-                    handleRunningModeKey(keyEvent)
+                    handlePlayingModeKey(keyEvent)
+                    break
+                case LEVEL_LOST:
+                    handleGameOverModeKey(keyEvent)
                     break
                 case STOPPED:
                     handleStoppedModeKey(keyEvent)
@@ -619,7 +633,7 @@ class Board extends JPanel implements ActionListener {
             }
         }
 
-        def handleRunningModeKey(KeyEvent event) {
+        def handlePlayingModeKey(KeyEvent event) {
 
             switch (event.keyCode) {
                 case VK_LEFT:
@@ -635,19 +649,23 @@ class Board extends JPanel implements ActionListener {
                     req_dx = 0; req_dy = 1
                     break
                 case VK_ESCAPE:
-                    gameMode = STOPPED
+                    gameState = STOPPED
                     break
                 case VK_SPACE:
-                    gameMode = PAUSED
+                    gameState = PAUSED
                     break
             }
+        }
+
+        def handleGameOverModeKey(KeyEvent event) {
+            exitGame()
         }
 
         def handleStoppedModeKey(KeyEvent event) {
 
             switch (event.keyCode) {
                 case VK_S:
-                    gameMode = RUNNING
+                    gameState = RUNNING
                     startGame()
                     break
                 case VK_Q:
@@ -660,7 +678,7 @@ class Board extends JPanel implements ActionListener {
         def handlePauzedModeKey(KeyEvent event) {
 
             if (event.keyCode == VK_SPACE) {
-                gameMode = RUNNING
+                gameState = RUNNING
                 resumeGame()
             }
         }
