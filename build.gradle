@@ -2,39 +2,43 @@ apply plugin: 'groovy'
 apply plugin: 'application'
 
 ext {
-
     java_sdk_version = '11'
-    groovy_sdk_version = '3.0.12'
-
-    slf4j_version = '2.0.0'
-    logback_version = '1.4.1'
-    spock_version = '2.2-groovy-3.0'
+    groovy_sdk_version = '4.0.2'
+    slf4j_version = '2.0.4'
+    logback_version = '1.4.6'
+    spock_version = '2.3-groovy-4.0'
 }
 
-sourceCompatibility = "${java_sdk_version}"
-targetCompatibility = "${java_sdk_version}"
-
 repositories {
-    jcenter()
     mavenCentral()
 }
 
-dependencies {
-    compile "org.codehaus.groovy:groovy-all:${groovy_sdk_version}"
-    compile "org.slf4j:slf4j-api:${slf4j_version}"
+java {
+    sourceCompatibility = "${java_sdk_version}"
+    targetCompatibility = "${java_sdk_version}"
+}
 
-    testCompile "org.spockframework:spock-core:${spock_version}"
+dependencies {
+    implementation platform("org.apache.groovy:groovy-bom:${groovy_sdk_version}")
+    implementation 'org.apache.groovy:groovy'
+    implementation "org.slf4j:slf4j-api:${slf4j_version}"
+
+    testImplementation platform("org.spockframework:spock-bom:${spock_version}")
+    testImplementation 'org.spockframework:spock-core'
 
     runtimeOnly "ch.qos.logback:logback-classic:${logback_version}"
 }
 
-run {
-    mainClassName = 'io.gfrank.pacman.Game'
-    args = ['']
+application {
+    mainClass = 'io.gfrank.pacman.Game'
 }
 
 jar {
     manifest {
-        attributes("Main-Class": "io.gfrank.Game")
+        attributes("Main-Class": "io.gfrank.pacman.Game")
     }
+}
+
+test {
+    useJUnitPlatform()
 }

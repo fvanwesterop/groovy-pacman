@@ -9,7 +9,6 @@ ifdef::env-github,env-browser[:outfilesuffix: .adoc]
 :pacman-addicts: https://sites.google.com/site/pacmangamearcade/
 :openjfx: https://openjfx.io/
 :javafx-game-dev: https://gamedevelopment.tutsplus.com/tutorials/introduction-to-javafx-for-game-development--cms-23835
-:javaws-guide: https://docs.oracle.com/javase/8/docs/technotes/guides/javaws/developersguide/contents.html
 
 == Origin
 
@@ -56,11 +55,27 @@ OpenJDK project. However in the Java8 SDK JavaFX classes are still there so ot s
 started. I'll checkout this {javafx-game-dev}[intro to JavaFX for game development] and take it from there.
 
 === game distribution
-Currently I have a gradle build in place that will create a TAR and/or ZIP distribution containing a convenient start
-script to run the game. This will suit my needs to deploy it on a RaspberryPi in an Arcade cabinet. However it also may
-be interesting to check if {javaws-guide}[Java Webstart] is still a thing and suitable to distribute a game like this.
-The JAWS concept is still great but I'm unsure if the JNLP mime type still works with modern browsers, and what about
-code signing and runtime support?
+The gradle build will create a TAR and/or ZIP distribution containing a convenient start script to run the game. Just take the TAR or ZIP, unpack it wherever you want and run the script for your system from a terminal window.
+
+Additionally, you will find a bunch of helpfull scripts in the `script`-folder:
+
+==== build-and-run-distro.sh
+This script will do exactly as described above: It will create and extract the distribution TAR file and run it from there.
+
+==== create-macos-app.sh
+This script will take the TAR distribution and convert it into a macOS executable, including a trimmed-down JDK
+based on the JDK used to build the application. You may need to change the `sdkVersion`-variable to match the JDK you
+want to use to build against. The script uses SDKman to temporarily activate that particular JDK during the build.
+
+If that JDK is currently not available on your system, sdkman will tell you, and suggests the command to install it.) The script
+relies on `sdkman` and `jpackage`. If either one is missing, it will supply suggestions on how to get it.
+
+When you are on another platform (Windows, Linux...) you should be able to tweak the script to produce a suitable executable
+for your platform as well. Just find the `tools` manual for your JDK online and check the platform specific settings you need.
+
+==== upload-to-rpi.sh
+This script will take the TAR distribution and upload and unpack it on your Raspberry PI. This suits my needs to deploy
+it on the RPI I use in the Arcade cabinet I want to build. You may want to edit the paths I used to you liking.
 
 == Things to do
 
