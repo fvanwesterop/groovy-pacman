@@ -45,14 +45,14 @@ the original game. Big help to reconstruct both maze and ghosts is the {pacman-a
 === rewrite procedural code
 The original Zetcode sources are written in a rather procedural manner: it's just two files basically, called Game and
 Board. The Game 'class' actually just contains some bootstrap code and the entire game itself is contained in the Board
-class. We can do a lot better that that, using object-oriented and functional paradigms where appropriate.
+class. We can do a lot better than that, using object-oriented and functional paradigms where appropriate.
 
 === port to OpenJFX
 The GUI code of the original Zetcode sources use old-school Java Swing libraries. Nowadays locally running GUI's are
-out-of-fashion anyway, but for games it still makes sense. However Swing really is outdated by now. Maybe nice to give
-it's successor a try which is nowadays {openjfx}[OpenJFX], since Oracle donated the JavaFX part of the JDK to the the
-OpenJDK project. However in the Java8 SDK JavaFX classes are still there so ot seems we do not need extra libs to get
-started. I'll checkout this {javafx-game-dev}[intro to JavaFX for game development] and take it from there.
+out-of-fashion anyway, but for games it still makes sense. However, Swing really is outdated by now. Maybe nice to give
+its successor a try which is nowadays {openjfx}[OpenJFX], since Oracle donated the JavaFX part of the JDK to the the
+OpenJDK project. However, in the Java8 SDK JavaFX classes are still there so ot seems we do not need extra libs to get
+started. I'll check out this {javafx-game-dev}[intro to JavaFX for game development] and take it from there.
 
 === game distribution
 The gradle build will create a TAR and/or ZIP distribution containing a convenient start script to run the game. Just take the TAR or ZIP, unpack it wherever you want and run the script for your system from a terminal window.
@@ -67,11 +67,12 @@ This script will take the TAR distribution and convert it into a macOS executabl
 based on the JDK used to build the application. You may need to change the `sdkVersion`-variable to match the JDK you
 want to use to build against. The script uses SDKman to temporarily activate that particular JDK during the build.
 
-If that JDK is currently not available on your system, sdkman will tell you, and suggests the command to install it.) The script
+If that JDK is currently not available on your system, sdkman will tell you, and suggests the command to install it. The script
 relies on `sdkman` and `jpackage`. If either one is missing, it will supply suggestions on how to get it.
 
 When you are on another platform (Windows, Linux...) you should be able to tweak the script to produce a suitable executable
-for your platform as well. Just find the `tools` manual for your JDK online and check the platform specific settings you need.
+for your platform as well. Just find the `tools`-section from the documentation of your JDK, and check the platform specific
+settings you need to supply to `jpackage`.
 
 ==== upload-to-rpi.sh
 This script will take the TAR distribution and upload and unpack it on your Raspberry PI. This suits my needs to deploy
@@ -81,7 +82,7 @@ it on the RPI I use in the Arcade cabinet I want to build. You may want to edit 
 
 === technical stuff
  - Port to Groovy 2.5 or 3.0, just for fun. Porting to Groovy 3 would also require JDK 9+
- - Refactor the code a bit since it does not really separates concerns very well
+ - Refactor the code a bit since it does not really separate concerns very well
  - Port the GUI part from Swing to (Open) JavaFX
  - Try out JWS
 
