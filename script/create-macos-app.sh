@@ -5,7 +5,7 @@ appName='groovy-pacman'
 distRoot='build/distributions'
 
 ## tip: find out required modules with 'jdep -q ${appName}.jar'
-requiredModules='java.base,java.desktop'
+requiredModules='java.base,java.desktop,java.naming'
 
 printSuggestedSolution() {
   printf "If you are currently using a JDK older than version 14, the jpackage tool is not available. However, you might purposely be building against this older JDK.\n"

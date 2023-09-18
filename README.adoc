@@ -84,7 +84,6 @@ it on the RPI I use in the Arcade cabinet I want to build. You may want to edit 
  - Port to Groovy 2.5 or 3.0, just for fun. Porting to Groovy 3 would also require JDK 9+
  - Refactor the code a bit since it does not really separate concerns very well
  - Port the GUI part from Swing to (Open) JavaFX
- - Try out JWS
 
 === funtional stuff
  - get rid of the simple default ghost and introduce the original Blinky and friends
